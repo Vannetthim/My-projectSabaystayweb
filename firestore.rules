@@ -1,0 +1,81 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check Admin role
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admin/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admin/$(request.auth.uid)).data.role in ['admin', 'super_admin'];
+    }
+
+    // Helper function to check Owner role
+    function isOwner() {
+      return request.auth != null
+        && (
+          exists(/databases/$(database)/documents/owner/$(request.auth.uid)) ||
+          (exists(/databases/$(database)/documents/user/$(request.auth.uid)) && 
+           get(/databases/$(database)/documents/user/$(request.auth.uid)).data.role == 'owner')
+        );
+    }
+
+    // 1. User Collection
+    match /user/{userId} {
+      allow get: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && ((request.auth.uid == userId && request.resource.data.role == resource.data.role) || isAdmin());
+    }
+
+    // 2. Owner Collection
+    match /owner/{ownerId} {
+      allow get: if request.auth != null && (request.auth.uid == ownerId || isAdmin());
+      allow list: if isAdmin();
+      allow create: if request.auth != null && request.auth.uid == ownerId;
+      allow update: if request.auth != null && (request.auth.uid == ownerId || isAdmin());
+    }
+
+    // 3. Admin Collection
+    match /admin/{adminId} {
+      allow get: if request.auth != null && request.auth.uid == adminId;
+    }
+
+    // 4. Hotels & Rooms Collections (Owners create/edit their own hotels)
+    match /hotels/{hotelId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && (isOwner() || isAdmin()) && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null && (resource.data.ownerId == request.auth.uid || isAdmin());
+      
+      // Nested Rooms
+      match /rooms/{roomId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && (
+          get(/databases/$(database)/documents/hotels/$(hotelId)).data.ownerId == request.auth.uid || isAdmin()
+        );
+      }
+    }
+
+    // 5. Bookings Collection (Shared between Users, Owners, and Admins)
+    match /bookings/{bookingId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update: if request.auth != null && (
+        resource.data.userId == request.auth.uid || 
+        resource.data.ownerId == request.auth.uid || 
+        isAdmin()
+      );
+      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // 6. Notifications Collection
+    match /notifications/{notificationId} {
+      allow create: if request.auth != null && request.resource.data.actorId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && (resource.data.recipientId == request.auth.uid || isAdmin());
+    }
+
+    // Admin catch-all rule
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

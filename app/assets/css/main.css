@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+:root {
+  --brand-navy: #0d224a;
+  --brand-navy-soft: #1e355f;
+  --page-bg: #f5f3ef;
+  --muted: #667085;
+}
+
+html {
+  font-size: 112.5%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: #1d2a3a;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* { 
+  box-sizing: border-box;
+}
+
+a {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.sabay-display {
+  font-family: "Georgia", "Times New Roman", serif;
+}
