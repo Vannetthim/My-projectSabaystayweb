@@ -1,8 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useAuth } from '~/composables/auth/useAuth'
 
 const { user, logout } = useAuth()
+
+const isMobileMenuOpen = ref(false)
+
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+function closeMobileMenu() {
+  isMobileMenuOpen.value = false
+}
 
 // Dynamic user displays with fallbacks
 const displayName = computed(() => {
@@ -63,18 +73,43 @@ const navLinks = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-white flex text-slate-800 font-sans">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between p-6 fixed h-full z-20 shadow-xs">
+  <div class="min-h-screen bg-[#070b14] text-slate-100 font-sans flex">
+    <!-- Backdrop overlay for mobile navigation -->
+    <div
+      v-if="isMobileMenuOpen"
+      class="fixed inset-0 z-40 bg-black/70 backdrop-blur-xs lg:hidden transition-opacity"
+      @click="closeMobileMenu"
+    />
+
+    <!-- Dark Sidebar -->
+    <aside
+      :class="[
+        'fixed top-0 bottom-0 left-0 z-50 flex w-64 flex-col justify-between border-r border-slate-800/80 bg-[#0b111e] p-6 transition-transform duration-300 ease-in-out lg:translate-x-0',
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      ]"
+    >
       <div>
         <!-- Logo Area -->
-        <div class="flex items-center gap-2 mb-8">
-          <div class="w-9 h-9 bg-[#1d1b4b] text-white flex items-center justify-center font-extrabold text-lg rounded-xl shadow-xs">
-            S
-          </div>
-          <span class="text-xl font-serif font-bold text-slate-900 tracking-wide">
-            Sabay<span class="text-[#1d1b4b]">Stay</span>
-          </span>
+        <div class="mb-8 flex items-center justify-between">
+          <NuxtLink to="/admin" class="flex items-center gap-2.5" @click="closeMobileMenu">
+            <div class="flex h-9 w-9 items-center justify-center rounded-sm bg-amber-500 font-black text-[#0b111e] shadow-md shadow-amber-500/10">
+              S
+            </div>
+            <span class="text-xl font-black uppercase tracking-wider text-white">
+              SABAY<span class="text-amber-500">STAY</span>
+            </span>
+          </NuxtLink>
+
+          <!-- Close button on mobile -->
+          <button
+            type="button"
+            class="rounded-sm p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden"
+            @click="closeMobileMenu"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <!-- Navigation Links -->
@@ -83,63 +118,76 @@ const navLinks = [
             v-for="link in navLinks"
             :key="link.path"
             :to="link.path"
-            exact-active-class="!bg-[#1d1b4b] !text-white font-bold shadow-xs"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100 hover:text-[#1d1b4b]"
+            exact-active-class="!bg-amber-500/15 !text-amber-400 !border-amber-500/50 font-bold"
+            class="flex items-center gap-3 rounded-sm border border-transparent px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 transition-all hover:bg-slate-800/60 hover:text-white"
+            @click="closeMobileMenu"
           >
-            <svg class="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="h-5 w-5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" :d="link.icon" />
             </svg>
-            {{ link.name }}
+            <span>{{ link.name }}</span>
           </NuxtLink>
         </nav>
       </div>
 
       <!-- Logout Button -->
       <button
+        type="button"
+        class="flex cursor-pointer items-center gap-3 rounded-sm border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-xs font-bold uppercase tracking-wider text-rose-400 transition-all hover:border-rose-500/40 hover:bg-rose-500/20 hover:text-rose-300"
         @click="logout"
-        class="flex items-center gap-3 px-4 py-3 text-rose-600 hover:bg-rose-50 hover:text-rose-700 rounded-xl text-sm font-semibold transition-colors cursor-pointer border border-transparent hover:border-rose-200"
       >
-        <svg class="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="h-5 w-5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
-        Logout
+        <span>Logout</span>
       </button>
     </aside>
 
     <!-- Main Content Wrapper -->
-    <div class="flex-1 ml-64 flex flex-col min-h-screen bg-white">
-      <!-- Top Header -->
-      <header class="h-20 bg-white/80 backdrop-blur-md px-8 flex items-center justify-end sticky top-0 z-10 border-b border-slate-200 shadow-2xs">
+    <div class="flex min-h-screen flex-1 flex-col transition-all duration-300 lg:ml-64">
+      <!-- Dark Top Header -->
+      <header class="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-800/80 bg-[#0b111e]/90 px-4 backdrop-blur-md sm:px-8">
+        <!-- Mobile Menu Toggle Button -->
+        <button
+          type="button"
+          class="flex h-10 w-10 items-center justify-center rounded-sm border border-slate-700/80 bg-slate-800/60 text-slate-300 hover:bg-slate-700 hover:text-white lg:hidden"
+          @click="toggleMobileMenu"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
 
-
-        <div class="flex items-center gap-4">
-          <!-- Notification Button -->
+        <div class="ml-auto flex items-center gap-3 sm:gap-4">
+          <!-- Notification Button with Amber Badge -->
           <NuxtLink 
             to="/admin/notifications" 
-            class="relative w-10 h-10 text-slate-500 hover:text-[#1d1b4b] bg-white rounded-xl shadow-xs border border-slate-200 flex items-center justify-center transition-colors"
+            class="relative flex h-10 w-10 items-center justify-center rounded-sm border border-slate-700/80 bg-[#121929] text-slate-300 shadow-xs transition-colors hover:border-amber-500/50 hover:text-amber-400"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-xs bg-amber-500 text-[10px] font-black text-black">
+              7
+            </span>
           </NuxtLink>
 
           <!-- User Profile Pill -->
-          <div class="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-xs">
-            <div class="text-right pl-2">
-              <p class="text-xs font-bold text-slate-800">{{ displayName }}</p>
-              <p class="text-[10px] text-[#1d1b4b] font-semibold uppercase tracking-wider">{{ userRole }}</p>
+          <div class="flex items-center gap-2.5 rounded-sm border border-slate-700/80 bg-[#121929] p-1.5 pl-3.5 shadow-xs sm:gap-3">
+            <div class="text-right">
+              <p class="text-xs font-black tracking-tight text-white">{{ displayName }}</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500">{{ userRole }}</p>
             </div>
-            <div class="w-9 h-9 rounded-full bg-[#1d1b4b] text-white flex items-center justify-center font-bold text-sm border border-slate-200 overflow-hidden shrink-0">
-              <img v-if="photoURL" :src="photoURL" alt="Profile" class="w-full h-full object-cover" />
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-amber-500/40 bg-amber-500 text-sm font-black text-[#0b111e]">
+              <img v-if="photoURL" :src="photoURL" alt="Profile" class="h-full w-full object-cover" />
               <span v-else>{{ userInitial }}</span>
             </div>
           </div>
         </div>
       </header>
 
-      <!-- Page Slot -->
-      <main class="p-8 flex-1 bg-slate-50/50">
+      <!-- Main Slot Area -->
+      <main class="flex-1 bg-[#070b14] p-4 sm:p-6 lg:p-8">
         <slot />
       </main>
     </div>

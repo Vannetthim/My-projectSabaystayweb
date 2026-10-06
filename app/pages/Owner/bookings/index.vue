@@ -68,11 +68,11 @@ const filteredBookings = computed(() => {
 
 const statusBadgeClass = (status) => {
   const s = status?.toLowerCase()
-  if (s === 'confirmed') return 'bg-emerald-100 text-emerald-700'
-  if (s === 'pending') return 'bg-amber-100 text-amber-700'
-  if (s === 'completed') return 'bg-indigo-100 text-indigo-700'
-  if (s === 'cancelled') return 'bg-rose-100 text-rose-700'
-  return 'bg-gray-100 text-gray-600'
+  if (s === 'confirmed') return 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/50'
+  if (s === 'pending') return 'bg-amber-950/60 text-amber-400 border border-amber-800/50'
+  if (s === 'completed') return 'bg-indigo-950/60 text-indigo-400 border border-indigo-800/50'
+  if (s === 'cancelled') return 'bg-rose-950/60 text-rose-400 border border-rose-800/50'
+  return 'bg-slate-800 text-slate-400 border border-slate-700'
 }
 
 onMounted(() => {
@@ -81,27 +81,29 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-8 max-w-7xl mx-auto space-y-6 font-sans bg-[#090d16] text-slate-200 min-h-screen">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-serif font-bold text-gray-900">Owner Bookings</h1>
-        <p class="text-gray-500 text-sm mt-1">View guest reservations and stay details for your properties.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-white">Owner Bookings</h1>
+        <p class="text-xs text-slate-400 mt-1">View guest reservations and stay details for your properties.</p>
       </div>
-      <div class="bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm text-sm font-semibold text-gray-700">
-        Total Bookings: {{ bookings.length }}
+      <div class="bg-[#101524] px-4 py-2 rounded-lg border border-slate-800/80 shadow-md text-xs font-semibold text-slate-300 self-start sm:self-auto">
+        Total Bookings: <span class="text-amber-400 font-bold">{{ bookings.length }}</span>
       </div>
     </div>
 
     <!-- Filter Tabs -->
-    <div class="flex gap-2 mb-6">
+    <div class="flex flex-wrap gap-2">
       <button 
         v-for="tab in ['All', 'Confirmed', 'Pending', 'Completed', 'Cancelled']" 
         :key="tab"
         @click="currentFilter = tab"
         :class="[
-          'px-4 py-2 rounded-lg text-sm font-medium transition',
-          currentFilter === tab ? 'bg-indigo-950 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
+          'px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer',
+          currentFilter === tab 
+            ? 'bg-[#151a30] text-amber-400 border-amber-500/40 shadow-sm' 
+            : 'bg-[#101524] text-slate-400 border-slate-800/80 hover:text-white hover:bg-[#141b2d]'
         ]"
       >
         {{ tab }}
@@ -110,50 +112,52 @@ onMounted(() => {
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-20">
-      <Loader2 class="w-8 h-8 animate-spin text-indigo-950" />
+      <Loader2 class="w-8 h-8 animate-spin text-amber-500" />
     </div>
 
     <!-- Bookings Table (View Only) -->
-    <div v-else class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div v-if="filteredBookings.length === 0" class="text-center py-16 text-gray-400 text-sm">
+    <div v-else class="bg-[#101524] rounded-lg border border-slate-800/80 shadow-md overflow-hidden">
+      <div v-if="filteredBookings.length === 0" class="text-center py-16 text-slate-400 text-sm">
         No bookings found.
       </div>
-      <table v-else class="w-full text-left border-collapse text-sm">
-        <thead>
-          <tr class="bg-gray-50/75 text-xs text-gray-500 border-b border-gray-200">
-            <th class="py-3 px-4 font-medium">Ref</th>
-            <th class="py-3 px-4 font-medium">Hotel Name</th>
-            <th class="py-3 px-4 font-medium">Guest</th>
-            <th class="py-3 px-4 font-medium">Stay Dates</th>
-            <th class="py-3 px-4 font-medium">Price</th>
-            <th class="py-3 px-4 font-medium text-right">Status</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <tr v-for="b in filteredBookings" :key="b.id" class="hover:bg-gray-50/50 transition">
-            <td class="py-3.5 px-4 font-mono text-xs text-gray-500">{{ b.ref }}</td>
-            <td class="py-3.5 px-4 font-medium text-gray-900">{{ b.hotelName }}</td>
-            <td class="py-3.5 px-4">
-              <div class="flex items-center gap-2.5">
-                <span class="w-7 h-7 bg-indigo-950 text-white rounded-full text-xs flex items-center justify-center font-semibold flex-shrink-0">
-                  {{ b.initials }}
-                </span>
-                <div>
-                  <p class="font-medium text-gray-900 text-xs">{{ b.guest }}</p>
-                  <p class="text-[11px] text-gray-400">{{ b.email }}</p>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-[#141b2d] text-slate-400 uppercase tracking-wider border-b border-slate-800/80 font-bold">
+              <th class="py-4 px-6">Ref</th>
+              <th class="py-4 px-6">Hotel Name</th>
+              <th class="py-4 px-6">Guest</th>
+              <th class="py-4 px-6">Stay Dates</th>
+              <th class="py-4 px-6">Price</th>
+              <th class="py-4 px-6 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            <tr v-for="b in filteredBookings" :key="b.id" class="hover:bg-[#141b2d]/60 transition">
+              <td class="py-4 px-6 font-mono text-xs text-slate-400">{{ b.ref }}</td>
+              <td class="py-4 px-6 font-bold text-white">{{ b.hotelName }}</td>
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-md text-xs flex items-center justify-center font-bold shrink-0">
+                    {{ b.initials }}
+                  </span>
+                  <div>
+                    <p class="font-bold text-slate-200 text-xs">{{ b.guest }}</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">{{ b.email }}</p>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td class="py-3.5 px-4 text-xs text-gray-600">{{ b.dates }}</td>
-            <td class="py-3.5 px-4 font-semibold text-gray-900">${{ b.price }}</td>
-            <td class="py-3.5 px-4 text-right">
-              <span :class="statusBadgeClass(b.status)" class="px-2.5 py-1 text-[11px] rounded-full font-medium inline-block">
-                {{ b.status }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td class="py-4 px-6 text-xs text-slate-300 font-medium">{{ b.dates }}</td>
+              <td class="py-4 px-6 font-bold text-amber-400 text-sm">${{ b.price }}</td>
+              <td class="py-4 px-6 text-right">
+                <span :class="statusBadgeClass(b.status)" class="px-2.5 py-1 text-[10px] rounded-md font-bold uppercase inline-block">
+                  {{ b.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>

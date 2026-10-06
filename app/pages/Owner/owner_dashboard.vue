@@ -23,7 +23,7 @@ const ownerName = computed(() => {
 
 const ownerInitials = computed(() => {
   const nameStr = ownerName.value
-  if (!nameStr || nameStr === 'Owner' || nameStr === 'User Account') return 'US'
+  if (!nameStr || nameStr === 'Owner' || nameStr === 'User Account') return 'A'
   const parts = nameStr.trim().split(' ')
   if (parts.length >= 2) {
     return (parts[0][0] + parts[1][0]).toUpperCase()
@@ -58,7 +58,7 @@ const loadDashboardData = async () => {
     const ownerHotelNames = ownerHotels.map(h => h.name?.toLowerCase())
     totalHotelsCount.value = ownerHotels.length
 
-   // 2. Fetch rooms accurately with fallback to 4
+    // 2. Fetch rooms accurately with fallback
     const allRooms = await getRooms()
     let ownerRooms = isAdmin ? allRooms : allRooms.filter(r => {
       if (ownerHotels.length === 0) return true
@@ -68,7 +68,6 @@ const loadDashboardData = async () => {
       return matchesId || matchesName || matchesOwner
     })
 
-    // If no filtered rooms found, fallback to all rooms or default to 4
     if (ownerRooms.length === 0 && allRooms && allRooms.length > 0) {
       ownerRooms = allRooms
     }
@@ -205,10 +204,10 @@ const svgAreaPath = computed(() => {
 
 const statusBadge = (status) => {
   const s = status?.toLowerCase()
-  if (s === 'confirmed') return 'bg-emerald-100 text-emerald-700'
-  if (s === 'upcoming' || s === 'pending') return 'bg-amber-100 text-amber-700'
-  if (s === 'completed') return 'bg-indigo-100 text-indigo-700'
-  return 'bg-gray-100 text-gray-600'
+  if (s === 'confirmed' || s === 'available') return 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/50'
+  if (s === 'upcoming' || s === 'pending') return 'bg-amber-950/60 text-amber-400 border border-amber-800/50'
+  if (s === 'completed') return 'bg-indigo-950/60 text-indigo-400 border border-indigo-800/50'
+  return 'bg-slate-800/80 text-slate-300 border border-slate-700/50'
 }
 
 onMounted(() => {
@@ -217,32 +216,32 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-6 bg-[#090d16] text-slate-100 min-h-screen font-sans">
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
       <div>
-        <h1 class="text-3xl font-serif font-bold text-gray-900">
+        <h1 class="text-3xl font-bold tracking-tight text-white">
           Good Day, {{ ownerName }}
         </h1>
-        <p class="text-gray-500 text-sm mt-1">Here is the overview of your properties and real-time live data.</p>
+        <p class="text-slate-400 text-sm mt-1">Here is the overview of your properties and real-time live data.</p>
       </div>
 
       <div class="flex items-center gap-4">
         <!-- Notification Bell -->
-        <button class="relative p-2.5 bg-white rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 shadow-sm transition">
+        <button class="relative p-2.5 bg-[#121827] rounded-lg border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition">
           <Bell class="w-5 h-5" />
-          <span v-if="pendingCount > 0" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+          <span v-if="pendingCount > 0" class="absolute -top-1 -right-1 bg-amber-500 text-black text-[10px] w-4 h-4 rounded-md flex items-center justify-center font-bold">
             {{ pendingCount }}
           </span>
         </button>
 
         <!-- Account Profile Badge -->
-        <div class="flex items-center gap-3 bg-white px-3.5 py-1.5 rounded-full border border-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 bg-[#121827] px-3.5 py-1.5 rounded-lg border border-slate-800 shadow-sm">
           <div class="text-right">
-            <p class="text-xs font-semibold text-gray-900">{{ ownerName }}</p>
-            <p class="text-[10px] uppercase text-gray-400 font-medium tracking-wide">{{ user?.role || 'Owner' }}</p>
+            <p class="text-xs font-semibold text-slate-200">{{ ownerName }}</p>
+            <p class="text-[10px] uppercase text-amber-500 font-bold tracking-wider">{{ user?.role || 'ADMIN' }}</p>
           </div>
-          <div class="w-8 h-8 rounded-full bg-indigo-950 text-white font-bold flex items-center justify-center text-xs">
+          <div class="w-8 h-8 rounded-lg bg-amber-500 text-black font-extrabold flex items-center justify-center text-xs">
             {{ ownerInitials }}
           </div>
         </div>
@@ -251,57 +250,57 @@ onMounted(() => {
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-20">
-      <Loader2 class="w-8 h-8 animate-spin text-indigo-950" />
+      <Loader2 class="w-8 h-8 animate-spin text-amber-500" />
     </div>
 
     <template v-else>
       <!-- Stat Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <!-- Card 1: Revenue -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center relative">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md flex justify-between items-center">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">Total Revenue</span>
-            <h3 class="text-3xl font-bold text-gray-900 font-sans">${{ totalRevenue }}</h3>
-            <span class="inline-block mt-3 text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">Live Firestore</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Revenue</span>
+            <h3 class="text-3xl font-bold text-white">${{ totalRevenue }}</h3>
+            <span class="inline-block mt-3 text-xs font-medium text-emerald-400 bg-emerald-950/50 border border-emerald-800/40 px-2.5 py-0.5 rounded-md">Live Firestore</span>
           </div>
-          <div class="w-14 h-14 bg-[#14103d] text-white rounded-xl flex items-center justify-center shadow-md">
-            <CreditCard class="w-7 h-7" />
+          <div class="w-12 h-12 bg-amber-500 text-black rounded-md flex items-center justify-center shadow-md">
+            <CreditCard class="w-6 h-6" />
           </div>
         </div>
 
         <!-- Card 2: Bookings -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center relative">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md flex justify-between items-center">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">Total Bookings</span>
-            <h3 class="text-3xl font-bold text-gray-900 font-sans">{{ totalBookingsCount }}</h3>
-            <span class="inline-block mt-3 text-xs font-medium text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full">Live reservations</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Bookings</span>
+            <h3 class="text-3xl font-bold text-white">{{ totalBookingsCount }}</h3>
+            <span class="inline-block mt-3 text-xs font-medium text-indigo-300 bg-indigo-950/50 border border-indigo-800/40 px-2.5 py-0.5 rounded-md">Live reservations</span>
           </div>
-          <div class="w-14 h-14 bg-[#00897b] text-white rounded-xl flex items-center justify-center shadow-md">
-            <Calendar class="w-7 h-7" />
+          <div class="w-12 h-12 bg-teal-600 text-white rounded-md flex items-center justify-center shadow-md">
+            <Calendar class="w-6 h-6" />
           </div>
         </div>
 
         <!-- Card 3: Hotels -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center relative">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md flex justify-between items-center">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">Total Hotels</span>
-            <h3 class="text-3xl font-bold text-gray-900 font-sans">{{ totalHotelsCount }}</h3>
-            <span class="inline-block mt-3 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">Active properties</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Hotels</span>
+            <h3 class="text-3xl font-bold text-white">{{ totalHotelsCount }}</h3>
+            <span class="inline-block mt-3 text-xs font-medium text-amber-400 bg-amber-950/50 border border-amber-800/40 px-2.5 py-0.5 rounded-md">Active properties</span>
           </div>
-          <div class="w-14 h-14 bg-[#e65100] text-white rounded-xl flex items-center justify-center shadow-md">
-            <Hotel class="w-7 h-7" />
+          <div class="w-12 h-12 bg-orange-600 text-white rounded-md flex items-center justify-center shadow-md">
+            <Hotel class="w-6 h-6" />
           </div>
         </div>
 
         <!-- Card 4: Rooms -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center relative">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md flex justify-between items-center">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-gray-500 block mb-1">Total Rooms</span>
-            <h3 class="text-3xl font-bold text-gray-900 font-sans">{{ totalRoomsCount }}</h3>
-            <span class="inline-block mt-3 text-xs font-medium text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full">0 Occ / {{ availableRoomsCount }} Avail</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Rooms</span>
+            <h3 class="text-3xl font-bold text-white">{{ totalRoomsCount }}</h3>
+            <span class="inline-block mt-3 text-xs font-medium text-rose-400 bg-rose-950/50 border border-rose-800/40 px-2.5 py-0.5 rounded-md">0 Occ / {{ availableRoomsCount }} Avail</span>
           </div>
-          <div class="w-14 h-14 bg-[#2962ff] text-white rounded-xl flex items-center justify-center shadow-md">
-            <Building2 class="w-7 h-7" />
+          <div class="w-12 h-12 bg-blue-600 text-white rounded-md flex items-center justify-center shadow-md">
+            <Building2 class="w-6 h-6" />
           </div>
         </div>
       </div>
@@ -309,32 +308,32 @@ onMounted(() => {
       <!-- Main Section: Dynamic SVG Chart & Next 48h -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Revenue Performance Dynamic Chart -->
-        <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <div class="lg:col-span-2 bg-[#101524] p-6 rounded-lg border border-slate-800/80 shadow-md">
           <div class="flex justify-between items-center mb-6">
             <div>
-              <h2 class="font-serif text-lg font-bold text-gray-900">Revenue Performance</h2>
-              <p class="text-xs text-gray-400 mt-0.5">Monthly earnings based on live bookings</p>
+              <h2 class="text-lg font-bold text-white">Revenue Performance</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Monthly earnings based on live bookings</p>
             </div>
-            <span class="text-xs bg-gray-100 px-3 py-1 rounded-md text-gray-600 font-medium">This Year</span>
+            <span class="text-xs bg-slate-800/80 px-3 py-1 rounded-md text-slate-300 font-medium border border-slate-700/50">This Year</span>
           </div>
 
           <div class="relative w-full h-64 pt-4">
             <svg class="w-full h-full overflow-visible" viewBox="0 0 500 180">
               <defs>
                 <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#312e81" stop-opacity="0.35" />
-                  <stop offset="100%" stop-color="#312e81" stop-opacity="0.0" />
+                  <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3" />
+                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0" />
                 </linearGradient>
               </defs>
-              <line x1="0" y1="30" x2="500" y2="30" stroke="#f3f4f6" stroke-width="1" />
-              <line x1="0" y1="75" x2="500" y2="75" stroke="#f3f4f6" stroke-width="1" />
-              <line x1="0" y1="120" x2="500" y2="120" stroke="#f3f4f6" stroke-width="1" />
-              <line x1="0" y1="165" x2="500" y2="165" stroke="#f3f4f6" stroke-width="1" />
+              <line x1="0" y1="30" x2="500" y2="30" stroke="#1e293b" stroke-width="1" />
+              <line x1="0" y1="75" x2="500" y2="75" stroke="#1e293b" stroke-width="1" />
+              <line x1="0" y1="120" x2="500" y2="120" stroke="#1e293b" stroke-width="1" />
+              <line x1="0" y1="165" x2="500" y2="165" stroke="#1e293b" stroke-width="1" />
               
               <path :d="svgAreaPath" fill="url(#chartGradient)" />
-              <path :d="svgChartPath" fill="none" stroke="#312e81" stroke-width="3" stroke-linecap="round" />
+              <path :d="svgChartPath" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" />
             </svg>
-            <div class="flex justify-between text-[11px] text-gray-400 mt-2 px-1">
+            <div class="flex justify-between text-[11px] text-slate-400 mt-2 px-1">
               <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
               <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
             </div>
@@ -342,22 +341,22 @@ onMounted(() => {
         </div>
 
         <!-- Next 48h -->
-        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <div class="bg-[#101524] p-6 rounded-lg border border-slate-800/80 shadow-md">
           <div class="flex justify-between items-center mb-4">
-            <h2 class=" text-lg font-bold text-gray-900">Next 48h</h2>
-            <NuxtLink to="/owner/bookings" class="text-xs text-gray-500 hover:text-gray-900">View All</NuxtLink>
+            <h2 class="text-lg font-bold text-white">Next 48h</h2>
+            <NuxtLink to="/owner/bookings" class="text-xs text-amber-500 hover:text-amber-400 transition">View All</NuxtLink>
           </div>
-          <div v-if="next48h.length === 0" class="text-sm text-gray-400 py-6 text-center">
+          <div v-if="next48h.length === 0" class="text-sm text-slate-500 py-6 text-center">
             No upcoming check-ins in the next 48 hours.
           </div>
           <div v-else class="space-y-4">
-            <div v-for="item in next48h" :key="item.name" class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-900 flex items-center justify-center font-bold text-xs flex-shrink-0">
+            <div v-for="item in next48h" :key="item.name" class="flex items-center gap-3 p-2 bg-[#141b2d] rounded-lg border border-slate-800/50">
+              <div class="w-10 h-10 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-xs flex-shrink-0">
                 {{ item.name.substring(0, 2).toUpperCase() }}
               </div>
               <div>
-                <p class="text-sm font-semibold text-gray-800">{{ item.name }}</p>
-                <p class="text-xs text-gray-400">{{ item.hotel }} • Time: {{ item.time }}</p>
+                <p class="text-sm font-semibold text-slate-100">{{ item.name }}</p>
+                <p class="text-xs text-slate-400">{{ item.hotel }} • Time: {{ item.time }}</p>
               </div>
             </div>
           </div>
@@ -365,16 +364,16 @@ onMounted(() => {
       </div>
 
       <!-- Recent Bookings Table -->
-      <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+      <div class="bg-[#101524] p-6 rounded-lg border border-slate-800/80 shadow-md">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="font-serif text-lg font-bold text-gray-900">Recent Bookings</h2>
+          <h2 class="text-lg font-bold text-white">Recent Bookings</h2>
         </div>
-        <div v-if="recentBookings.length === 0" class="text-center py-6 text-gray-400 text-sm">
+        <div v-if="recentBookings.length === 0" class="text-center py-6 text-slate-500 text-sm">
           No bookings available yet.
         </div>
         <table v-else class="w-full text-left border-collapse text-sm">
           <thead>
-            <tr class="text-xs text-gray-400 border-b border-gray-100">
+            <tr class="text-xs text-slate-400 border-b border-slate-800">
               <th class="py-3 font-medium">Guest</th>
               <th class="py-3 font-medium">Property</th>
               <th class="py-3 font-medium">Stay Dates</th>
@@ -383,19 +382,19 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="booking in recentBookings" :key="booking.id" class="border-b border-gray-50 text-gray-700">
+            <tr v-for="booking in recentBookings" :key="booking.id" class="border-b border-slate-800/50 text-slate-300 hover:bg-[#141c2e] transition">
               <td class="py-3.5 font-medium flex items-center gap-2">
-                <span class="w-7 h-7 bg-indigo-950 text-white rounded-full text-xs flex items-center justify-center font-semibold">{{ booking.initials }}</span>
+                <span class="w-7 h-7 bg-amber-500 text-black rounded-md text-xs flex items-center justify-center font-bold">{{ booking.initials }}</span>
                 {{ booking.guest }}
               </td>
-              <td class="py-3.5">{{ booking.property }}</td>
-              <td class="py-3.5 text-xs text-gray-500">{{ booking.dates }}</td>
+              <td class="py-3.5 text-slate-300">{{ booking.property }}</td>
+              <td class="py-3.5 text-xs text-slate-400">{{ booking.dates }}</td>
               <td class="py-3.5">
-                <span :class="statusBadge(booking.status)" class="px-2.5 py-1 text-[11px] rounded-full font-medium">
+                <span :class="statusBadge(booking.status)" class="px-2.5 py-1 text-[11px] rounded-md font-medium">
                   {{ booking.status }}
                 </span>
               </td>
-              <td class="py-3.5 text-right font-medium text-gray-900">${{ booking.payout }}</td>
+              <td class="py-3.5 text-right font-medium text-amber-400">${{ booking.payout }}</td>
             </tr>
           </tbody>
         </table>

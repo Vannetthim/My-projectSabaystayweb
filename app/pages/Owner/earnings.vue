@@ -1,97 +1,100 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-8 max-w-7xl mx-auto space-y-6 font-sans bg-[#090d16] text-slate-200 min-h-screen">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <NuxtLink 
           to="/owner/owner_dashboard" 
-          class="text-xs font-semibold text-gray-500 hover:text-indigo-950 flex items-center gap-1.5 transition mb-2"
+          class="text-xs font-semibold text-slate-400 hover:text-amber-400 flex items-center gap-1.5 transition mb-2"
         >
-          <ArrowLeft class="w-4 h-4" />
+          <ArrowLeft class="w-3.5 h-3.5" />
           Back to Overview
         </NuxtLink>
-        <h1 class="text-3xl font-serif font-bold text-gray-900">Earnings & Financials</h1>
-        <p class="text-sm text-gray-500 mt-1">Track revenue performance and payment payouts.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-white">Earnings & Financials</h1>
+        <p class="text-xs text-slate-400 mt-1">Track revenue performance and payment payouts.</p>
       </div>
 
       <div class="flex items-center gap-3">
         <select 
           v-model="selectedYear" 
-          class="bg-white border border-gray-200 text-gray-800 rounded-xl px-4 py-2 text-sm outline-none shadow-xs cursor-pointer"
+          class="bg-[#101524] border border-slate-800/80 text-slate-200 rounded-lg px-4 py-2 text-xs font-semibold outline-none focus:border-amber-500/50 transition cursor-pointer shadow-md"
         >
-          <option value="2026">Year 2026</option>
-          <option value="All">All Time</option>
+          <option value="2026" class="bg-[#101524] text-slate-200">Year 2026</option>
+          <option value="All" class="bg-[#101524] text-slate-200">All Time</option>
         </select>
+        
         <button 
           @click="downloadReport" 
-          class="px-4 py-2 bg-indigo-950 text-white text-sm font-medium rounded-xl shadow-xs hover:bg-indigo-900 transition flex items-center gap-2 cursor-pointer"
+          class="bg-[#101524] hover:bg-[#141b2d] text-slate-200 border border-slate-800/80 rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition cursor-pointer shadow-md"
         >
-          <Download class="w-4 h-4" />
+          <Download class="w-3.5 h-3.5 text-amber-500" />
           Download Report
         </button>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 p-12 text-center text-sm text-gray-500 shadow-xs mb-8">
-      <Loader2 class="w-6 h-6 animate-spin mx-auto text-indigo-950 mb-2" />
+    <div v-if="loading" class="bg-[#101524] rounded-lg border border-slate-800/80 p-12 text-center text-xs text-slate-400 shadow-md">
+      <Loader2 class="w-6 h-6 animate-spin mx-auto text-amber-500 mb-2" />
       Loading financial records...
     </div>
 
     <template v-else>
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Gross Revenue</span>
-          <div class="text-3xl font-bold text-gray-900 mt-2">${{ grossRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-          <div class="text-xs text-emerald-600 mt-1 font-medium">↑ Gross earnings before platform fee</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Total Gross Revenue</span>
+          <div class="text-3xl font-bold text-white">${{ grossRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+          <div class="text-xs text-emerald-400 mt-1.5 font-medium flex items-center gap-1">
+            <span>↑</span> Gross earnings before platform fee
+          </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Net Payout Received</span>
-          <div class="text-3xl font-bold text-emerald-700 mt-2">${{ netPayoutReceived.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-          <div class="text-xs text-gray-400 mt-1">After 15% platform commission</div>
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Net Payout Received</span>
+          <div class="text-3xl font-bold text-amber-400">${{ netPayoutReceived.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+          <div class="text-xs text-slate-400 mt-1.5">After 15% platform commission</div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pending Payout</span>
-          <div class="text-3xl font-bold text-amber-600 mt-2">${{ pendingPayout.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-          <div class="text-xs text-gray-400 mt-1">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Pending Payout</span>
+          <div class="text-3xl font-bold text-amber-500/90">${{ pendingPayout.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+          <div class="text-xs text-slate-400 mt-1.5">
             {{ pendingCount }} pending reservation(s)
           </div>
         </div>
       </div>
 
       <!-- Payout History Table -->
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-          <h2 class="text-lg font-serif font-bold text-gray-900">Payout History</h2>
-          <span class="text-xs text-gray-400">{{ payouts.length }} transactions</span>
+      <div class="bg-[#101524] rounded-lg border border-slate-800/80 shadow-md overflow-hidden">
+        <div class="p-6 border-b border-slate-800/80 flex justify-between items-center">
+          <h2 class="text-base font-bold text-white">Payout History</h2>
+          <span class="text-xs text-slate-400">{{ payouts.length }} transactions</span>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm">
+          <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-gray-50 text-xs text-gray-400 border-b border-gray-100 uppercase tracking-wider">
-                <th class="py-3 px-6 font-medium">Payout ID</th>
-                <th class="py-3 px-6 font-medium">Date</th>
-                <th class="py-3 px-6 font-medium">Method</th>
-                <th class="py-3 px-6 font-medium">Gross Amount</th>
-                <th class="py-3 px-6 font-medium">Net Payout</th>
-                <th class="py-3 px-6 font-medium text-right">Status</th>
+              <tr class="bg-[#141b2d] text-slate-400 border-b border-slate-800/80 uppercase tracking-wider text-[11px]">
+                <th class="py-3.5 px-6 font-bold">Payout ID</th>
+                <th class="py-3.5 px-6 font-bold">Date</th>
+                <th class="py-3.5 px-6 font-bold">Method</th>
+                <th class="py-3.5 px-6 font-bold">Gross Amount</th>
+                <th class="py-3.5 px-6 font-bold">Net Payout</th>
+                <th class="py-3.5 px-6 font-bold text-right">Status</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr v-for="payout in payouts" :key="payout.id" class="hover:bg-gray-50/50 transition-colors">
-                <td class="py-4 px-6 font-medium text-gray-900">{{ payout.id }}</td>
-                <td class="py-4 px-6 text-gray-600">{{ payout.date }}</td>
-                <td class="py-4 px-6 text-gray-600">{{ payout.method }}</td>
-                <td class="py-4 px-6 font-medium text-gray-900">${{ Number(payout.gross).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</td>
-                <td class="py-4 px-6 font-bold text-emerald-700">${{ Number(payout.net).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</td>
+            <tbody class="divide-y divide-slate-800/60 text-slate-300">
+              <tr v-for="payout in payouts" :key="payout.id" class="hover:bg-[#141b2d]/50 transition-colors">
+                <td class="py-4 px-6 font-bold text-white">{{ payout.id }}</td>
+                <td class="py-4 px-6 text-slate-400">{{ payout.date }}</td>
+                <td class="py-4 px-6 text-slate-400">{{ payout.method }}</td>
+                <td class="py-4 px-6 font-semibold text-slate-200">${{ Number(payout.gross).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</td>
+                <td class="py-4 px-6 font-bold text-amber-400">${{ Number(payout.net).toLocaleString('en-US', { minimumFractionDigits: 2 }) }}</td>
                 <td class="py-4 px-6 text-right">
                   <span 
-                    :class="payout.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
-                    class="px-2.5 py-1 text-xs rounded-full font-medium"
+                    :class="payout.status === 'Completed' ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/50' : 'bg-amber-950/60 text-amber-400 border border-amber-800/50'"
+                    class="px-2.5 py-0.5 text-[10px] rounded-md font-bold uppercase tracking-wider inline-block"
                   >
                     {{ payout.status }}
                   </span>
@@ -99,7 +102,7 @@
               </tr>
 
               <tr v-if="payouts.length === 0">
-                <td colspan="6" class="py-8 text-center text-xs text-gray-400">
+                <td colspan="6" class="py-8 text-center text-xs text-slate-500">
                   No payout records found.
                 </td>
               </tr>

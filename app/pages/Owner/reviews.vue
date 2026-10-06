@@ -1,27 +1,27 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-8 max-w-7xl mx-auto space-y-6 font-sans bg-[#090d16] text-slate-200 min-h-screen">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <NuxtLink 
           to="/owner/owner_dashboard" 
-          class="text-xs font-semibold text-gray-500 hover:text-indigo-950 flex items-center gap-1.5 transition mb-2"
+          class="text-xs font-semibold text-slate-400 hover:text-amber-400 flex items-center gap-1.5 transition mb-2"
         >
-          <ArrowLeft class="w-4 h-4" />
+          <ArrowLeft class="w-3.5 h-3.5" />
           Back to Overview
         </NuxtLink>
-        <h1 class="text-3xl font-serif font-bold text-gray-900">Reviews & Ratings</h1>
-        <p class="text-sm text-gray-500 mt-1">Monitor guest feedback and manage property reputation.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-white">Reviews & Ratings</h1>
+        <p class="text-xs text-slate-400 mt-1">Monitor guest feedback and manage property reputation.</p>
       </div>
 
       <!-- Property Selector -->
       <div>
         <select 
           v-model="selectedProperty" 
-          class="bg-white border border-gray-200 text-gray-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-950 shadow-xs cursor-pointer"
+          class="bg-[#101524] border border-slate-800/80 text-slate-200 rounded-lg px-4 py-2.5 text-xs font-semibold outline-none focus:border-amber-500/50 shadow-md cursor-pointer"
         >
-          <option value="All">All Properties</option>
-          <option v-for="prop in ownerProperties" :key="prop.id" :value="prop.name">
+          <option value="All" class="bg-[#101524] text-slate-200">All Properties</option>
+          <option v-for="prop in ownerProperties" :key="prop.id" :value="prop.name" class="bg-[#101524] text-slate-200">
             {{ prop.name }}
           </option>
         </select>
@@ -29,35 +29,35 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="bg-white rounded-2xl border border-gray-100 p-12 text-center text-sm text-gray-500 shadow-xs mb-8">
-      <Loader2 class="w-6 h-6 animate-spin mx-auto text-indigo-950 mb-2" />
+    <div v-if="loading" class="bg-[#101524] rounded-lg border border-slate-800/80 p-12 text-center text-xs text-slate-400 shadow-md">
+      <Loader2 class="w-6 h-6 animate-spin mx-auto text-amber-500 mb-2" />
       Loading guest reviews...
     </div>
 
     <template v-else>
       <!-- Rating Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Average Rating</span>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Average Rating</span>
           <div class="flex items-baseline gap-2 mt-2">
-            <span class="text-3xl font-bold text-gray-900">{{ averageRating }}</span>
-            <span class="text-xs text-emerald-600 font-medium">★ Overall</span>
+            <span class="text-3xl font-bold text-white">{{ averageRating }}</span>
+            <span class="text-xs text-amber-400 font-bold">★ Overall</span>
           </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Reviews</span>
-          <div class="text-3xl font-bold text-gray-900 mt-2">{{ filteredReviews.length }}</div>
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Reviews</span>
+          <div class="text-3xl font-bold text-white mt-2">{{ filteredReviews.length }}</div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Response Rate</span>
-          <div class="text-3xl font-bold text-gray-900 mt-2">{{ responseRate }}%</div>
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Response Rate</span>
+          <div class="text-3xl font-bold text-emerald-400 mt-2">{{ responseRate }}%</div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-xs">
-          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pending Replies</span>
-          <div class="text-3xl font-bold text-indigo-950 mt-2">{{ pendingRepliesCount }}</div>
+        <div class="bg-[#101524] p-5 rounded-lg border border-slate-800/80 shadow-md">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pending Replies</span>
+          <div class="text-3xl font-bold text-amber-400 mt-2">{{ pendingRepliesCount }}</div>
         </div>
       </div>
 
@@ -66,31 +66,31 @@
         <div 
           v-for="rev in filteredReviews" 
           :key="rev.id" 
-          class="bg-white rounded-2xl border border-gray-100 p-6 shadow-xs"
+          class="bg-[#101524] rounded-lg border border-slate-800/80 p-6 shadow-md"
         >
           <div class="flex justify-between items-start mb-4">
             <div>
               <div class="flex items-center gap-3">
-                <h3 class="font-bold text-gray-900 text-base">{{ rev.guestName || rev.guest || 'Anonymous Guest' }}</h3>
-                <span class="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md font-medium">
+                <h3 class="font-bold text-white text-base">{{ rev.guestName || rev.guest || 'Anonymous Guest' }}</h3>
+                <span class="text-[11px] bg-[#151a30] text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-md font-semibold">
                   {{ rev.roomName || rev.property || 'Standard Room' }}
                 </span>
               </div>
-              <div class="text-xs text-gray-400 mt-1">
+              <div class="text-xs text-slate-400 mt-1">
                 {{ rev.hotelName || rev.property || 'Property' }} • {{ formatDate(rev.createdAt || rev.date) }}
               </div>
             </div>
-            <div class="flex items-center gap-1 bg-amber-50 text-amber-700 font-semibold px-3 py-1 rounded-full text-xs">
+            <div class="flex items-center gap-1 bg-amber-950/60 border border-amber-800/50 text-amber-400 font-bold px-3 py-1 rounded-md text-xs">
               ★ {{ Number(rev.rating || 5).toFixed(1) }}
             </div>
           </div>
 
-          <p class="text-sm text-gray-700 leading-relaxed mb-4">{{ rev.comment || rev.reviewText || 'No comment provided.' }}</p>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">{{ rev.comment || rev.reviewText || 'No comment provided.' }}</p>
 
           <!-- Owner Response Section -->
-          <div v-if="rev.reply" class="bg-gray-50 border-l-4 border-indigo-950 p-4 rounded-r-xl text-xs space-y-1">
-            <div class="font-semibold text-indigo-950">Property Owner Response:</div>
-            <p class="text-gray-600">{{ rev.reply }}</p>
+          <div v-if="rev.reply" class="bg-[#141b2d] border-l-4 border-amber-500 p-4 rounded-r-lg text-xs space-y-1 border-y border-r border-slate-800/60">
+            <div class="font-bold text-amber-400">Property Owner Response:</div>
+            <p class="text-slate-300 leading-relaxed">{{ rev.reply }}</p>
           </div>
 
           <div v-else class="pt-2">
@@ -99,21 +99,21 @@
                 v-model="replyText" 
                 placeholder="Write a polite response to the guest..." 
                 rows="3"
-                class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-800 outline-none focus:border-indigo-950"
+                class="w-full bg-[#141b2d] border border-slate-800 rounded-lg p-3 text-xs text-slate-200 placeholder-slate-500 outline-none focus:border-amber-500/50 transition"
               ></textarea>
               <div class="flex justify-end gap-2">
                 <button 
                   @click="cancelReply" 
-                  class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer"
+                  class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white hover:bg-[#141b2d] rounded-lg transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
                   @click="submitReply(rev)" 
                   :disabled="submittingReply"
-                  class="px-4 py-1.5 text-xs bg-indigo-950 hover:bg-indigo-900 text-white font-medium rounded-lg flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  class="px-4 py-1.5 text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center gap-1.5 cursor-pointer transition disabled:opacity-50"
                 >
-                  <Loader2 v-if="submittingReply" class="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 v-if="submittingReply" class="w-3.5 h-3.5 animate-spin text-slate-950" />
                   Post Reply
                 </button>
               </div>
@@ -121,15 +121,15 @@
             <button 
               v-else 
               @click="openReplyBox(rev.id)" 
-              class="text-xs font-semibold text-indigo-950 hover:underline flex items-center gap-1 cursor-pointer"
+              class="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1.5 cursor-pointer transition"
             >
-              <MessageSquare class="w-3.5 h-3.5 text-indigo-950" />
+              <MessageSquare class="w-3.5 h-3.5 text-amber-400" />
               Reply to guest
             </button>
           </div>
         </div>
 
-        <div v-if="filteredReviews.length === 0" class="bg-white rounded-2xl border border-gray-100 p-12 text-center text-sm text-gray-400">
+        <div v-if="filteredReviews.length === 0" class="bg-[#101524] rounded-lg border border-slate-800/80 p-12 text-center text-xs text-slate-400 shadow-md">
           No reviews available for the selected property.
         </div>
       </div>

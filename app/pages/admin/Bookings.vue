@@ -159,7 +159,6 @@ const changeStatus = async (id, newStatus) => {
 
     const booking = bookings.value.find((item) => item.id === targetId)
     
-    // Fix: Using the top-level nuxtApp reference, as useNuxtApp() will throw an error if called after `await`
     const authUser = nuxtApp.$auth?.currentUser
     const actorId = authUser?.uid || 'admin'
     
@@ -291,7 +290,6 @@ const exportCSV = () => {
 
   const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n')
   
-  // Fix: Use Blob instead of encodeURI. Special characters like '#' (common in IDs) break encodeURI string downloads
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
@@ -315,106 +313,121 @@ onUnmounted(() => {
 
 <template>
   <ClientOnly>
-    <div class="space-y-6 max-w-7xl mx-auto pb-12 text-slate-700">
-      <!-- Header -->
-      <div class="bg-white rounded-2xl p-6 border border-slate-300 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+    <div class="space-y-6 max-w-7xl mx-auto pb-12 text-slate-200 font-sans">
+      <!-- Header Banner -->
+      <div class="bg-[#0b111e] rounded-sm p-6 border border-slate-800/80 shadow-md flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 class="text-3xl font-bold text-slate-900 tracking-tight font-serif">Booking Management</h1>
-          <p class="text-sm text-slate-500 mt-1">Manage room reservations and send updates to guests</p>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-500">ADMINISTRATION PLATFORM</span>
+          <h1 class="text-3xl font-black text-white tracking-tight mt-0.5">Booking Management</h1>
+          <p class="text-xs text-slate-400 mt-1">Real-time property oversight and live reservation controls</p>
         </div>
         <div class="flex items-center gap-3">
           <button 
             @click="exportCSV" 
-            class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-bold px-3.5 py-2 rounded-xl transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+            class="text-xs bg-[#121929] hover:bg-[#1a2338] text-slate-200 border border-slate-700/80 font-bold px-4 py-2.5 rounded-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
           >
-            <svg class="w-4 h-4 text-[#1d1b4b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Export CSV
           </button>
-          <span class="text-xs bg-[#1d1b4b] text-white font-bold px-3.5 py-2 rounded-xl shadow-sm">
+          <span class="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-400 font-extrabold px-4 py-2.5 rounded-sm shadow-sm">
             Total: {{ bookings.length }}
           </span>
         </div>
       </div>
 
-      <!-- Filters Bar -->
-      <div class="flex flex-col md:flex-row md:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-300 shadow-sm">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search by hotel name, guest name, or Ref ID..."
-          class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#1d1b4b] focus:bg-white transition-colors"
-        />
-        <select
-          v-model="selectedStatus"
-          class="px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:border-[#1d1b4b] focus:bg-white transition-colors"
-        >
-          <option value="All">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Check-in">Check-in</option>
-          <option value="Check-out">Check-out</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
+      <!-- Live Sync Status & Filters Bar -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0b111e] p-4 rounded-sm border border-slate-800/80 shadow-md">
+        <div class="flex-1 flex items-center gap-3 bg-[#070b14] border border-slate-800 px-3.5 py-2 rounded-sm">
+          <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search booking data by hotel, guest, or Ref ID..."
+            class="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <select
+            v-model="selectedStatus"
+            class="px-4 py-2 bg-[#070b14] border border-slate-800 rounded-sm text-xs font-bold text-slate-300 focus:outline-none focus:border-amber-500/50 transition-colors"
+          >
+            <option value="All">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Check-in">Check-in</option>
+            <option value="Check-out">Check-out</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+
+          <div class="hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold px-3 py-2 rounded-sm shrink-0">
+            <span class="w-2 h-2 rounded-none bg-emerald-500 animate-pulse"></span>
+            SYSTEM ONLINE
+          </div>
+        </div>
       </div>
 
       <!-- Bookings Table Wrapper -->
-      <div class="bg-white rounded-2xl border border-slate-300 shadow-sm overflow-hidden">
+      <div class="bg-[#0b111e] rounded-sm border border-slate-800/80 shadow-md overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[700px]">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-300 text-[11px] text-slate-500 uppercase tracking-wider font-bold">
-                <th class="py-3.5 px-6">Ref</th>
-                <th class="py-3.5 px-6">Hotel Name</th>
-                <th class="py-3.5 px-6">Guest</th>
-                <th class="py-3.5 px-6">Dates</th>
-                <th class="py-3.5 px-6">Price</th>
-                <th class="py-3.5 px-6">Status</th>
-                <th class="py-3.5 px-6 text-right">Actions</th>
+              <tr class="bg-[#0e1628] border-b border-slate-800/80 text-[11px] text-slate-400 uppercase tracking-wider font-extrabold">
+                <th class="py-4 px-6">Ref</th>
+                <th class="py-4 px-6">Hotel Name</th>
+                <th class="py-4 px-6">Guest</th>
+                <th class="py-4 px-6">Dates</th>
+                <th class="py-4 px-6">Price</th>
+                <th class="py-4 px-6">Status</th>
+                <th class="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-300 text-xs">
-              <tr v-for="b in paginatedBookings" :key="b.id" class="hover:bg-slate-50 transition-colors">
-                <td class="py-4 px-6 font-mono font-bold text-slate-600">{{ b.ref || `#${String(b.id).slice(0, 6)}` }}</td>
-                <td class="py-4 px-6 font-bold text-slate-900">{{ b.hotelName }}</td>
-                <td class="py-4 px-6 text-slate-700 font-medium">
+            <tbody class="divide-y divide-slate-800/60 text-xs">
+              <tr v-for="b in paginatedBookings" :key="b.id" class="hover:bg-[#121929]/70 transition-colors">
+                <td class="py-4 px-6 font-mono font-bold text-amber-500">{{ b.ref || `#${String(b.id).slice(0, 6)}` }}</td>
+                <td class="py-4 px-6 font-bold text-white">{{ b.hotelName }}</td>
+                <td class="py-4 px-6 text-slate-300 font-medium">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center border border-slate-300">
+                    <!-- Square avatar box without circle rounding -->
+                    <div class="w-9 h-9 rounded-sm bg-amber-500 text-[#0b111e] overflow-hidden shrink-0 flex items-center justify-center font-black border border-amber-500/30">
                       <img 
                         v-if="b.guestAvatar" 
                         :src="b.guestAvatar" 
                         alt="Guest Avatar" 
-                        class="w-full h-full object-cover" 
+                        class="w-full h-full object-cover rounded-sm" 
                       />
-                      <span v-else class="text-xs font-bold text-[#1d1b4b]">
+                      <span v-else class="text-xs">
                         {{ (b.guestName || 'U').charAt(0).toUpperCase() }}
                       </span>
                     </div>
                     <div>
-                      <p class="font-bold text-slate-900">{{ b.guestName }}</p>
-                      <p v-if="b.guestEmail" class="mt-0.5 text-[11px] text-slate-500">{{ b.guestEmail }}</p>
+                      <p class="font-bold text-slate-100">{{ b.guestName }}</p>
+                      <p v-if="b.guestEmail" class="mt-0.5 text-[11px] text-slate-400">{{ b.guestEmail }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="py-4 px-6 text-slate-500 whitespace-nowrap">{{ b.checkIn }} — {{ b.checkOut }}</td>
-                <td class="py-4 px-6 font-bold text-slate-800 whitespace-nowrap">${{ formatPrice(b.totalPrice) }}</td>
+                <td class="py-4 px-6 text-slate-400 whitespace-nowrap">{{ b.checkIn }} — {{ b.checkOut }}</td>
+                <td class="py-4 px-6 font-black text-white whitespace-nowrap">${{ formatPrice(b.totalPrice) }}</td>
                 <td class="py-4 px-6 whitespace-nowrap">
                   <span
                     :class="{
-                      'bg-amber-50 text-amber-700 border-amber-300': normalizeStatus(b.status) === 'pending',
-                      'bg-emerald-50 text-emerald-700 border-emerald-300': normalizeStatus(b.status) === 'confirmed',
-                      'bg-indigo-50 text-indigo-700 border-indigo-300': normalizeStatus(b.status) === 'check-in',
-                      'bg-slate-100 text-slate-700 border-slate-300': normalizeStatus(b.status) === 'check-out',
-                      'bg-rose-50 text-rose-700 border-rose-300': normalizeStatus(b.status) === 'cancelled'
+                      'bg-amber-500/10 text-amber-400 border-amber-500/30': normalizeStatus(b.status) === 'pending',
+                      'bg-emerald-500/10 text-emerald-400 border-emerald-500/30': normalizeStatus(b.status) === 'confirmed',
+                      'bg-indigo-500/10 text-indigo-400 border-indigo-500/30': normalizeStatus(b.status) === 'check-in',
+                      'bg-slate-800 text-slate-300 border-slate-700': normalizeStatus(b.status) === 'check-out',
+                      'bg-rose-500/10 text-rose-400 border-rose-500/30': normalizeStatus(b.status) === 'cancelled'
                     }"
-                    class="px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5"
+                    class="px-3 py-1 rounded-sm border text-[10px] font-extrabold uppercase tracking-wider inline-flex items-center gap-1.5"
                   >
-                    <span class="w-1.5 h-1.5 rounded-full" :class="{
+                    <span class="w-1.5 h-1.5 rounded-none" :class="{
                       'bg-amber-500': normalizeStatus(b.status) === 'pending',
                       'bg-emerald-500': normalizeStatus(b.status) === 'confirmed',
-                      'bg-[#1d1b4b]': normalizeStatus(b.status) === 'check-in',
-                      'bg-slate-500': normalizeStatus(b.status) === 'check-out',
+                      'bg-indigo-400': normalizeStatus(b.status) === 'check-in',
+                      'bg-slate-400': normalizeStatus(b.status) === 'check-out',
                       'bg-rose-500': normalizeStatus(b.status) === 'cancelled'
                     }"></span>
                     {{ b.status }}
@@ -425,7 +438,7 @@ onUnmounted(() => {
                     v-if="normalizeStatus(b.status) === 'pending'"
                     :disabled="actionLoadingId === b.id"
                     @click="changeStatus(b.id, 'Confirmed')"
-                    class="px-3 py-1.5 bg-[#1d1b4b] hover:bg-[#1a1843] text-white rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-[#0b111e] rounded-sm font-black transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Approve
                   </button>
@@ -434,7 +447,7 @@ onUnmounted(() => {
                     v-if="normalizeStatus(b.status) === 'confirmed'"
                     :disabled="actionLoadingId === b.id"
                     @click="changeStatus(b.id, 'Check-in')"
-                    class="px-3 py-1.5 bg-[#1d1b4b] hover:bg-[#1a1843] text-white rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm font-black transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Check In
                   </button>
@@ -443,7 +456,7 @@ onUnmounted(() => {
                     v-if="normalizeStatus(b.status) === 'check-in'"
                     :disabled="actionLoadingId === b.id"
                     @click="changeStatus(b.id, 'Check-out')"
-                    class="px-3 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-sm font-black transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Check Out
                   </button>
@@ -452,7 +465,7 @@ onUnmounted(() => {
                     v-if="!['cancelled', 'check-out'].includes(normalizeStatus(b.status))"
                     :disabled="actionLoadingId === b.id"
                     @click="changeStatus(b.id, 'Cancelled')"
-                    class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-sm font-bold transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -461,7 +474,7 @@ onUnmounted(() => {
                     :disabled="actionLoadingId === b.id"
                     @click="deleteBooking(b.id)"
                     title="Delete Booking"
-                    class="p-1.5 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center align-middle disabled:opacity-50"
+                    class="p-1.5 bg-[#070b14] hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-500/40 rounded-sm transition-colors cursor-pointer inline-flex items-center justify-center align-middle disabled:opacity-50"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -471,16 +484,16 @@ onUnmounted(() => {
               </tr>
 
               <tr v-if="loading">
-                <td colspan="7" class="py-16 text-center text-slate-500 text-xs font-medium">
+                <td colspan="7" class="py-16 text-center text-slate-400 text-xs font-medium">
                   <div class="inline-flex items-center gap-2">
-                    <div class="w-4 h-4 rounded-full border-2 border-[#1d1b4b] border-t-transparent animate-spin"></div>
+                    <div class="w-4 h-4 border-2 border-amber-500 border-t-transparent animate-spin"></div>
                     Fetching live booking data from Firestore...
                   </div>
                 </td>
               </tr>
 
               <tr v-if="!loading && filteredBookings.length === 0">
-                <td colspan="7" class="py-16 text-center text-slate-400 text-xs font-medium">
+                <td colspan="7" class="py-16 text-center text-slate-500 text-xs font-medium">
                   No booking records match your search criteria.
                 </td>
               </tr>
@@ -489,12 +502,12 @@ onUnmounted(() => {
         </div>
 
         <!-- Pagination Controls -->
-        <div v-if="!loading && filteredBookings.length > 0" class="px-6 py-4 bg-slate-50 border-t border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+        <div v-if="!loading && filteredBookings.length > 0" class="px-6 py-4 bg-[#0e1628] border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div class="flex items-center gap-2">
             <span>Show</span>
             <select 
               v-model="itemsPerPage"
-              class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 focus:outline-none focus:border-[#1d1b4b]"
+              class="bg-[#070b14] border border-slate-800 rounded-sm px-2 py-1 text-slate-200 focus:outline-none focus:border-amber-500/50"
             >
               <option :value="5">5</option>
               <option :value="10">10</option>
@@ -506,20 +519,20 @@ onUnmounted(() => {
 
           <div class="flex items-center gap-4">
             <span>
-              Page <strong class="text-slate-900">{{ currentPage }}</strong> of <strong class="text-slate-900">{{ totalPages }}</strong>
+              Page <strong class="text-white">{{ currentPage }}</strong> of <strong class="text-white">{{ totalPages }}</strong>
             </span>
-            <div class="inline-flex gap-1">
+            <div class="inline-flex gap-1.5">
               <button
                 :disabled="currentPage === 1"
                 @click="currentPage--"
-                class="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg text-slate-700 font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                class="px-3.5 py-1.5 bg-[#070b14] hover:bg-slate-800 border border-slate-800 rounded-sm text-slate-300 font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 Previous
               </button>
               <button
                 :disabled="currentPage === totalPages"
                 @click="currentPage++"
-                class="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg text-slate-700 font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                class="px-3.5 py-1.5 bg-[#070b14] hover:bg-slate-800 border border-slate-800 rounded-sm text-slate-300 font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 Next
               </button>
