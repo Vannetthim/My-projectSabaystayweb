@@ -43,7 +43,7 @@ const destinations: Destination[] = [
     name: "Koh Sdach",
     description: "Ultimate overwater serenity and quiet island days.",
     image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=85",
+      "https://ik.imagekit.io/tvlk/apr-asset/dgXfoyh24ryQLRcGq00cIdKHRmotrWLNlvG-TxlcLxGkiDwaUSggleJNPRgIHCX6/hotel/asset/20027582-eb5b23c6f1ac2447990e361083d364b6.jpeg?tr=q-80,c-at_max,w-740,h-500&_src=imagekit",
     region: "Coastal",
     season: "Winter",
     metric: "4.9 guest rating",
@@ -54,7 +54,7 @@ const destinations: Destination[] = [
     name: "Song Saa",
     description: "Eco-luxury private islands amid vibrant biodiversity.",
     image:
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1600&q=85",
+      "https://media.cntravellerme.com/photos/6571f2bde3ac838218269ae3/16:9/w_2560,c_limit/Song-Saa-Private-Island__2018_Josejouland_Over-Water-Villa_Two-Bedroom_Pool_12.jpg",
     region: "Coastal",
     season: "Winter",
     metric: "Wild by nature",
